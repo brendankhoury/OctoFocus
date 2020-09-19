@@ -30,7 +30,8 @@ namespace DefaultMod
         // I.E.: unrpoductiveTime -= productiveTimeElapsed * unproductiveRegeration
         static double unproductiveRegeration = 1; 
 
-        Image[] octoCostume = new Image[4];
+        Image[] octoCostume = new Image[6];
+        Image transparent;
 
         int frameCounter = 0;
 
@@ -60,6 +61,10 @@ namespace DefaultMod
             octoCostume[1] = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "idle_1.png"));
             octoCostume[2] = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "idle_2.png"));
             octoCostume[3] = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "idle_3.png"));
+            octoCostume[4] = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "idle_2.png"));
+            octoCostume[5] = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "idle_1.png"));
+
+            transparent = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "transparent.png"));
 
             // Figure out current active window.
             timeStopwatch = new Stopwatch();
@@ -75,7 +80,7 @@ namespace DefaultMod
             g.renderData.brushGooseOutline = new SolidBrush(Color.Transparent);
             g.renderData.brushGooseWhite = new SolidBrush(Color.Transparent);
             g.renderData.brushGooseOrange = new SolidBrush(Color.Transparent);
-            // g.renderData.shadowBrush = new TextureBrush(transparent);
+            g.renderData.shadowBrush = new TextureBrush(transparent);
 
             g.parameters.StepTimeNormal = 500f;
             g.parameters.StepTimeCharged = 500f;
@@ -179,26 +184,28 @@ namespace DefaultMod
             int temp = frameCounter;
             Image currentOcto;
 
-            if (Math.Abs(g.velocity.x) > 1 && Math.Abs(g.velocity.y) > 1)
+            double speed = Math.Sqrt(g.velocity.x * g.velocity.x + g.velocity.y * g.velocity.y);
+            
+            if (speed > 150)
                 temp *= 2;
 
-            if (temp / 10 < 0 || temp / 10 > 3)
+            if (temp / 30 < 0 || temp / 30 > 5)
             {
                 temp = 0;
                 frameCounter = 0;
             }
 
-            currentOcto = octoCostume[temp/10];
+            currentOcto = octoCostume[temp/30];
 
             var direction = g.direction+90;
             var headPoint = g.rig.bodyCenter;
 
-            var verticalOffset = currentOcto.Height /4;
+            var verticalOffset = currentOcto.Height /2;
             var horizontalOffset = currentOcto.Width / 2;
 
             Bitmap newSprite = RotateImage(new Bitmap(currentOcto), direction);
 
-            graph.DrawImage(newSprite, headPoint.x, headPoint.y);
+            graph.DrawImage(newSprite, headPoint.x-horizontalOffset, headPoint.y-verticalOffset);
 
             frameCounter++;
 
