@@ -193,7 +193,7 @@ namespace DefaultMod
 
             double speed = Math.Sqrt(g.velocity.x * g.velocity.x + g.velocity.y * g.velocity.y);
             
-            if (speed > 100)
+            if (speed > 70)
                 temp *= 2;
 
             if (temp / 30 < 0 || temp / 30 > 7)
@@ -214,12 +214,12 @@ namespace DefaultMod
 
             int target;
 
-            if (speed > 100) {
+            if (speed > 70 && g.currentTask != API.TaskDatabase.getTaskIndexByID("GrabbingOctocat")*/) {
                 target = (int)g.direction + 90;
                 if(!prevMoving)
                     locked = false;
                 prevMoving = true;
-            }
+            } 
             else {
                 target = 0;
                 if(prevMoving)
@@ -250,8 +250,12 @@ namespace DefaultMod
                 direction += 360;
 
             Bitmap newSprite = RotateImage(new Bitmap(currentOcto), direction);
-
-            graph.DrawImage(newSprite, headPoint.x-horizontalOffset, headPoint.y-verticalOffset);
+            
+            if(g.currentTask == API.TaskDatabase.getTaskIndexByID("GrabbingOctocat")) {
+                graph.DrawImage(newSprite, headPoint.x-horizontalOffset, headPoint.y-(1.5f*verticalOffset));
+            }
+            else
+                graph.DrawImage(newSprite, headPoint.x-horizontalOffset, headPoint.y-verticalOffset);
 
             frameCounter++;
 

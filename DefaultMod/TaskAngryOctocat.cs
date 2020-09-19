@@ -68,7 +68,7 @@ namespace DefaultMod
             if (Vector2.Distance(mousePos, goose.rig.bodyCenter) < 50)
             {
                 API.Goose.setCurrentTaskByID(goose, "GrabbingOctocat");
-                Console.WriteLine("Changed To grabbing cursor");
+                //Console.WriteLine("Changed To grabbing cursor");
             }
             if (Time.time - data.timeStarted > 10)
             {

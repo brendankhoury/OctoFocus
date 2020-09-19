@@ -61,23 +61,22 @@ namespace DefaultMod
         public override GooseTaskData GetNewTaskData(GooseEntity goose)
         {
             GrabbingOctocatTaskData taskData = new GrabbingOctocatTaskData();
-            //IntPtr activeWindow = GetForegroundWindow();
-            //Rect lpRect = new Rect();
-            //bool success = GetWindowRect(activeWindow, out lpRect);
-            //if (!success)
-            //{
-            //    taskData.activeWindowTopRightCorner = new Vector2((float)500, (float)500);
-            //}
-            //else
-            //{
-            //    taskData.activeWindowTopRightCorner = new Vector2((float)lpRect.Right, (float)lpRect.Top);
-
-            //}
-            //string output = "Top: " + lpRect.Top + " Right: " + lpRect.Right;
-            //Console.WriteLine(output);
+            IntPtr activeWindow = GetForegroundWindow();
+            Rect lpRect = new Rect();
+            bool success = GetWindowRect(activeWindow, out lpRect);
+            if (!success)
+            {
+                taskData.activeWindowTopRightCorner = new Vector2((float)500, (float)500);
+            }
+            else
+            {
+                taskData.activeWindowTopRightCorner = new Vector2((float)lpRect.Right, (float)lpRect.Top);
+            }
+            string output = "Top: " + lpRect.Top + " Right: " + lpRect.Right;
+            Console.WriteLine(output);
 
             // TODO: Remove me
-            taskData.activeWindowTopRightCorner = new Vector2((float)500, (float)500);
+            // taskData.activeWindowTopRightCorner = new Vector2((float)500, (float)500);
 
             return taskData;
         }
@@ -89,19 +88,17 @@ namespace DefaultMod
             // This function is only called when we're the currently running task.
             // The goose's taskData will be of this task's type.
             GrabbingOctocatTaskData data = (GrabbingOctocatTaskData)goose.currentTaskData;
-            //goose.targetPos = data.activeWindowTopRightCorner;
+            goose.targetPos = data.activeWindowTopRightCorner;
 
 
             /* ----------- Grabbing -------------- */
-            //Cursor cursor = new Cursor(Cursor.Current.Handle);
-            //Cursor.Position = new System.Drawing.Point((int)goose.position.x, (int)goose.position.y);
+            Cursor cursor = new Cursor(Cursor.Current.Handle);
+            Cursor.Position = new System.Drawing.Point((int)goose.position.x, (int)goose.position.y);
 
-            //if (Vector2.Distance(goose.targetPos, goose.position) < 50)
-            //{
-            //    API.Goose.setCurrentTaskByID(goose, "HappyOctocat");
-
-
-            //}
+            if (Vector2.Distance(goose.targetPos, goose.position) < 50)
+            {
+                API.Goose.setCurrentTaskByID(goose, "HappyOctocat");
+            }
 
             //TODO, detect if near top right, if near top right, sleep for a bit :/
             /*goose.currentTaskData.activeWindow = GetActiveWindow();*/
