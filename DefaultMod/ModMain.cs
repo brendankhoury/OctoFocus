@@ -280,9 +280,9 @@ namespace DefaultMod
 //            direction = 0;
             if (direction == 0)
                 direction += 1;
-            // direction = 0;
+            direction = 0;
             if (direction > 180) direction = -(360 - direction);
-            Bitmap newSprite = RotateImage(currentOcto, (float) direction, true);
+            Bitmap newSprite = RotateImage(new Bitmap(currentOcto), (float) direction);
             
             if(g.currentTask == API.TaskDatabase.getTaskIndexByID("GrabbingOctocat"))
                 graph.DrawImage(newSprite, headPoint.x-horizontalOffset, headPoint.y-(int)(1.5f*verticalOffset));
@@ -293,7 +293,7 @@ namespace DefaultMod
 
         }
 
-        /*private static Bitmap RotateImage(Bitmap b, float angle)
+        private static Bitmap RotateImage(Bitmap b, float angle)
         {
 
             Bitmap returnBitmap = new Bitmap(b.Width, b.Height);
@@ -308,67 +308,6 @@ namespace DefaultMod
 
             return returnBitmap;
 
-        }*/
-
-        public static Bitmap RotateImage(Image image, float angle, bool bNoClip)
-        {
-            int W, H, X, Y;
-            if (bNoClip)
-            {
-                double dW = (double)image.Width;
-                double dH = (double)image.Height;
-
-                double degrees = Math.Abs(angle);
-                if (degrees <= 90)
-                {
-                    double radians = 0.0174532925 * degrees;
-                    double dSin = Math.Sin(radians);
-                    double dCos = Math.Cos(radians);
-                    W = (int)(dH * dSin + dW * dCos);
-                    H = (int)(dW * dSin + dH * dCos);
-                    X = (W - image.Width) / 2;
-                    Y = (H - image.Height) / 2;
-                }
-                else
-                {
-                    degrees -= 90;
-                    double radians = 0.0174532925 * degrees;
-                    double dSin = Math.Sin(radians);
-                    double dCos = Math.Cos(radians);
-                    W = (int)(dW * dSin + dH * dCos);
-                    H = (int)(dH * dSin + dW * dCos);
-                    X = (W - image.Width) / 2;
-                    Y = (H - image.Height) / 2;
-                }
-            }
-            else
-            {
-                W = image.Width;
-                H = image.Height;
-                X = 0;
-                Y = 0;
-            }
-
-            //create a new empty bitmap to hold rotated image
-            Bitmap bmpRet = new Bitmap(W, H);
-            bmpRet.SetResolution(image.HorizontalResolution, image.VerticalResolution);
-
-            //make a graphics object from the empty bitmap
-            Graphics g = Graphics.FromImage(bmpRet);
-
-            //Put the rotation point in the "center" of the image
-            g.TranslateTransform(X+(float)image.Width / 2, X+(float)image.Height / 2);
-
-            //rotate the image
-            g.RotateTransform(angle);
-
-            //move the image back
-            g.TranslateTransform(-X-(float)image.Width / 2, -X-(float)image.Height / 2);
-
-            //draw passed in image onto graphics object
-            g.DrawImage(image, new PointF(0 + X, 0 + Y));
-
-            return bmpRet;
         }
 
 
