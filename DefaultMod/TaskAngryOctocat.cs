@@ -65,11 +65,12 @@ namespace DefaultMod
 
             Vector2 mousePos = new Vector2(Input.mouseX, Input.mouseY);
 
-            if (Vector2.Distance(mousePos, goose.rig.bodyCenter) < 10)
+            if (Vector2.Distance(mousePos, goose.rig.bodyCenter) < 50)
             {
                 API.Goose.setCurrentTaskByID(goose, "GrabbingOctocat");
+                Console.WriteLine("Changed To grabbing cursor");
             }
-            if (Time.time - data.timeStarted > 5)
+            if (Time.time - data.timeStarted > 10)
             {
                 API.Goose.setCurrentTaskByID(goose, "HappyOctocat");
 

@@ -31,6 +31,7 @@ namespace DefaultMod
         static double unproductiveRegeration = 1; 
 
         Image[] octoCostume = new Image[8];
+        Image grabbyCostume;
         Image transparent;
 
         int frameCounter = 0;
@@ -44,11 +45,12 @@ namespace DefaultMod
         bool locked = true;
         bool prevMoving = false;
         
-        string[] productiveWindows = { "visual studio", "stack overflow", "github", "vs code", "google", "duckduckgo", "devpost" };
+        string[] productiveWindows = { "visual studio", "stack overflow", "github", "vs code", "duckduckgo", "devpost" };
         string[] unproductiveWindows = { "steam", "facebook", "reddit", "discord", "youtube", "instagram", "league of legends", "clubpenguin", "netflix", "valorant" };
 
         string activeWindow;
         Stopwatch timeStopwatch;
+        Stopwatch angryTimer;
         //Image octocat = Image.FromFile("octocat.jpg");
 
         // Gets called automatically, passes in a class that contains pointers to
@@ -70,11 +72,14 @@ namespace DefaultMod
             octoCostume[5] = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "idle_3.png"));
             octoCostume[6] = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "idle_2.png"));
             octoCostume[7] = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "idle_1.png"));
+            
+            grabbyCostume = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "graby_0.png"));
 
             transparent = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "transparent.png"));
 
             // Figure out current active window.
             timeStopwatch = new Stopwatch();
+            angryTimer = new Stopwatch();
             activeWindow = GetActiveWindow();
             timeStopwatch.Start();
         }
@@ -114,21 +119,21 @@ namespace DefaultMod
             }
             else
             {
-                foreach (var windowName in productiveWindows)
+                foreach (var windowName in unproductiveWindows)
                 {
                     if (activeWindow.Contains(windowName))
                     {
-                        productive = true;
+                        unproductive = true;
                         break;
                     }
                 }
-                if (!productive)
+                if (!unproductive)
                 {
-                    foreach (var windowName in unproductiveWindows)
+                    foreach (var windowName in productiveWindows)
                     {
                         if (activeWindow.Contains(windowName))
                         {
-                            unproductive = true;
+                            productive = true;
                             break;
                         }
                     }
@@ -152,23 +157,25 @@ namespace DefaultMod
                 }
                 activeWindow = checkedWindow;
                 timeStopwatch.Restart();
-                string output = "Productive?: " + productive + " " + checkedWindow + " ProductiveWork: " + productiveWork + " || UnproductiveWork: " + unproductiveWork;
+                string output = "Productive?: " + productive + " ProductiveWork: " + productiveWork + " || UnproductiveWork: " + unproductiveWork;
                 Console.WriteLine(output);
             }
 
 
             if (g.currentTask == API.TaskDatabase.getTaskIndexByID("HappyOctocat"))
             {
-                if (unproductive && unproductiveWork >= unproductiveCap)
+                if (unproductive && unproductiveWork >= unproductiveCap && angryTimer.ElapsedMilliseconds / 10000 % 2 == 0)
                 {
                     API.Goose.setCurrentTaskByID(g, "AngryOctocat");
+                    angryTimer.Start();
                 }
             }
-            else if (g.currentTask == API.TaskDatabase.getTaskIndexByID("AngryOctocat"))
+            else if (g.currentTask == API.TaskDatabase.getTaskIndexByID("AngryOctocat") || g.currentTask == API.TaskDatabase.getTaskIndexByID("GrabbingOctocat"))
             {
-                if (productive)
+                if (productive || angryTimer.ElapsedMilliseconds / 10000 % 2 != 0) // Should cause octocat to become happy 10 seconds after an angry state is triggered. 
                 {
                     API.Goose.setCurrentTaskByID(g, "HappyOctocat");
+                    angryTimer.Reset();
                 }
             }
             else
@@ -186,7 +193,7 @@ namespace DefaultMod
 
             double speed = Math.Sqrt(g.velocity.x * g.velocity.x + g.velocity.y * g.velocity.y);
             
-            if (speed > 150)
+            if (speed > 100)
                 temp *= 2;
 
             if (temp / 30 < 0 || temp / 30 > 7)
@@ -195,7 +202,10 @@ namespace DefaultMod
                 frameCounter = 0;
             }
 
-            currentOcto = octoCostume[temp/30];
+            if(g.currentTask == API.TaskDatabase.getTaskIndexByID("GrabbingOctocat"))
+                currentOcto = grabbyCostume;
+            else
+                currentOcto = octoCostume[temp/30];
 
             var headPoint = g.rig.bodyCenter;
 
@@ -204,7 +214,7 @@ namespace DefaultMod
 
             int target;
 
-            if (speed > 75) {
+            if (speed > 100) {
                 target = (int)g.direction + 90;
                 if(!prevMoving)
                     locked = false;
