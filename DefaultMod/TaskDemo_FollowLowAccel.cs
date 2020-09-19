@@ -62,7 +62,7 @@ namespace DefaultMod
             // The goose's taskData will be of this task's type.
             CheckWindowTaskData data = (CheckWindowTaskData)goose.currentTaskData;
 
-            goose.currentTaskData.activeWindow = GetActiveWindow();
+            /*goose.currentTaskData.activeWindow = GetActiveWindow();*/
         }
     }
 }
