@@ -25,7 +25,7 @@ namespace DefaultMod
     public class ModEntryPoint : IMod
     {
         // The maximum amount of time that a user can be unproductive for before octocat harrasses the cursor. 
-        static long unproductiveCap = 1000 * 6;
+        static long unproductiveCap = (long) (1000 * 60 * 0.35);
         // Every second a user is productive, their unproductive timer decreases. 
         // I.E.: unrpoductiveTime -= productiveTimeElapsed * unproductiveRegeration
         static double unproductiveRegeration = 1; 
@@ -51,6 +51,7 @@ namespace DefaultMod
         string activeWindow;
         Stopwatch timeStopwatch;
         Stopwatch angryTimer;
+        Stopwatch deltaTimer;
         //Image octocat = Image.FromFile("octocat.jpg");
 
         // Gets called automatically, passes in a class that contains pointers to
@@ -60,7 +61,7 @@ namespace DefaultMod
             // Subscribe to whatever events we want
             InjectionPoints.PostTickEvent += WindowCheck;
             InjectionPoints.PreTickEvent += OneTimeInitialization;
-            InjectionPoints.PostRenderEvent += OctoPostRender;
+            InjectionPoints.PreRenderEvent += OctoPostRender; // post render
 
             Console.WriteLine(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "idle_0.png"));
 
@@ -80,6 +81,8 @@ namespace DefaultMod
             // Figure out current active window.
             timeStopwatch = new Stopwatch();
             angryTimer = new Stopwatch();
+            deltaTimer = new Stopwatch();
+            deltaTimer.Start();
             activeWindow = GetActiveWindow();
             timeStopwatch.Start();
         }
@@ -174,7 +177,7 @@ namespace DefaultMod
                     } else {
                         API.Goose.setCurrentTaskByID(g, "AngryOctocat");
                     }
-                    angryTimer.Start();
+                    unproductiveWork = 0;
                 }
             }
             else if (g.currentTask == API.TaskDatabase.getTaskIndexByID("AngryOctocat") || g.currentTask == API.TaskDatabase.getTaskIndexByID("GrabbingOctocat"))
@@ -195,6 +198,7 @@ namespace DefaultMod
 
         public void OctoPostRender(GooseEntity g, Graphics graph)
         {
+
             int temp = frameCounter;
             Image currentOcto;
 
@@ -209,10 +213,15 @@ namespace DefaultMod
                 frameCounter = 0;
             }
 
+            // Set octocat costume based on grabbing vs idle state
+
+            // Brendan Breaks Code:
+            int frameId = Math.Abs(((int)deltaTimer.ElapsedMilliseconds % 2000)/200 - 5);
+
             if(g.currentTask == API.TaskDatabase.getTaskIndexByID("GrabbingOctocat"))
                 currentOcto = grabbyCostume;
             else
-                currentOcto = octoCostume[temp/30];
+                currentOcto = octoCostume[frameId];
 
             var headPoint = g.rig.bodyCenter;
 
@@ -221,13 +230,16 @@ namespace DefaultMod
 
             int target;
 
+            
             if (speed > 70 && g.currentTask != API.TaskDatabase.getTaskIndexByID("GrabbingOctocat")) {
+                // State moving and not grabbing cursor
                 target = (int)g.direction + 90;
                 if(!prevMoving)
                     locked = false;
                 prevMoving = true;
             } 
             else {
+                // State idle or grabbing cursor
                 target = 0;
                 if(prevMoving)
                     locked = false;
@@ -242,7 +254,7 @@ namespace DefaultMod
                     direction += 2;
                     if(direction >= 360)
                         direction -= 360;
-                } else if(current < 180 && Math.Abs(current) > 3) {
+                } else if(current < 180 && Math.Abs(current) > 1) { // > 3
                     direction -= 2;
                 } else {
                     locked = true;
@@ -256,10 +268,17 @@ namespace DefaultMod
             else if(direction < 0) 
                 direction += 360;
 
+            // Brendan Breaks Code:
+//            Vector2 bottomRightCorner = new Vector2( (int) SystemParameters.WorkArea.Width- 70, (int) SystemParameters.WorkArea.Height - 150);
+//            if (Vector2.Distance(bottomRightCorner, g.rig.bodyCenter) < 10 && direction < 10 && (direction < 10 || direction > 350)) {
+//                direction = 0;
+//            } 
+            direction = 0;
+
             Bitmap newSprite = RotateImage(new Bitmap(currentOcto), direction);
             
             if(g.currentTask == API.TaskDatabase.getTaskIndexByID("GrabbingOctocat")) {
-                graph.DrawImage(newSprite, headPoint.x-horizontalOffset, headPoint.y-(1.5f*verticalOffset));
+                graph.DrawImage(newSprite, headPoint.x-horizontalOffset, headPoint.y-(int)(1.5f*verticalOffset));
             }
             else
                 graph.DrawImage(newSprite, headPoint.x-horizontalOffset, headPoint.y-verticalOffset);
