@@ -25,12 +25,12 @@ namespace DefaultMod
     public class ModEntryPoint : IMod
     {
         // The maximum amount of time that a user can be unproductive for before octocat harrasses the cursor. 
-        static long unproductiveCap = 1000 * 60 * 5;
+        static long unproductiveCap = 1000 * 6;
         // Every second a user is productive, their unproductive timer decreases. 
         // I.E.: unrpoductiveTime -= productiveTimeElapsed * unproductiveRegeration
         static double unproductiveRegeration = 1; 
 
-        Image[] octoCostume = new Image[6];
+        Image[] octoCostume = new Image[8];
         Image transparent;
 
         int frameCounter = 0;
@@ -38,9 +38,14 @@ namespace DefaultMod
         long productiveWork = 0;
         long unproductiveWork = 0;
         long nahMan = 0;
+
+        int direction = -1;
+
+        bool locked = true;
+        bool prevMoving = false;
         
         string[] productiveWindows = { "visual studio", "stack overflow", "github", "vs code", "google", "duckduckgo", "devpost" };
-        string[] unproductiveWindows = { "steam", "facebook", "reddit", "discord", "youtube", "instagram", "league of legends", "clubpenguin" };
+        string[] unproductiveWindows = { "steam", "facebook", "reddit", "discord", "youtube", "instagram", "league of legends", "clubpenguin", "netflix", "valorant" };
 
         string activeWindow;
         Stopwatch timeStopwatch;
@@ -61,8 +66,10 @@ namespace DefaultMod
             octoCostume[1] = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "idle_1.png"));
             octoCostume[2] = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "idle_2.png"));
             octoCostume[3] = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "idle_3.png"));
-            octoCostume[4] = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "idle_2.png"));
-            octoCostume[5] = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "idle_1.png"));
+            octoCostume[4] = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "idle_4.png"));
+            octoCostume[5] = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "idle_3.png"));
+            octoCostume[6] = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "idle_2.png"));
+            octoCostume[7] = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "idle_1.png"));
 
             transparent = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "transparent.png"));
 
@@ -86,7 +93,7 @@ namespace DefaultMod
             g.parameters.StepTimeCharged = 500f;
 
             // octoCostume[0] = Sonicgoose.Properties.Resources.frame_1;
-
+            API.Goose.setCurrentTaskByID(g, "AngryOctocat");
             InjectionPoints.PreTickEvent -= OneTimeInitialization;
         }
 
@@ -97,13 +104,6 @@ namespace DefaultMod
             string checkedWindow = GetActiveWindow();
 
 
-            if (g.currentTask != API.TaskDatabase.getTaskIndexByID("HappyOctocat"))
-            {
-                API.Goose.setCurrentTaskByID(g, "HappyOctocat");
-                Console.WriteLine("Octocat should have found happiness by now.");
-            }
-
-
 
             if (checkedWindow == null) return;
             else checkedWindow = checkedWindow.ToLower();
@@ -112,10 +112,8 @@ namespace DefaultMod
                 activeWindow = checkedWindow;
                 return;
             }
-            else if (checkedWindow != activeWindow)
+            else
             {
-
-
                 foreach (var windowName in productiveWindows)
                 {
                     if (activeWindow.Contains(windowName))
@@ -139,7 +137,10 @@ namespace DefaultMod
                 if (productive)
                 {
                     productiveWork += timeStopwatch.ElapsedMilliseconds;
-                    unproductiveWork -= (long)(timeStopwatch.ElapsedMilliseconds * unproductiveRegeration);
+                    if (unproductiveWork > 0)
+                    {
+                        unproductiveWork -= (long)(timeStopwatch.ElapsedMilliseconds * unproductiveRegeration);
+                    }
                 }
                 else if (unproductive)
                 {
@@ -149,32 +150,31 @@ namespace DefaultMod
                 {
                     nahMan += timeStopwatch.ElapsedMilliseconds;
                 }
-
                 activeWindow = checkedWindow;
                 timeStopwatch.Restart();
-                string output = checkedWindow + " ProductiveWork: " + productiveWork + " || UnproductiveWork: " + unproductiveWork;
+                string output = "Productive?: " + productive + " " + checkedWindow + " ProductiveWork: " + productiveWork + " || UnproductiveWork: " + unproductiveWork;
                 Console.WriteLine(output);
             }
 
 
-            //if (g.currentTask == API.TaskDatabase.getTaskIndexByID("HappyOctocat"))
-            //{
-            //    if (unproductive && unproductiveWork >= unproductiveCap)
-            //    {
-            //        API.Goose.setCurrentTaskByID(g, "AngryOctocat");
-            //    }
-            //}
-            //else if (g.currentTask == API.TaskDatabase.getTaskIndexByID("AngryOctocat"))
-            //{
-            //    if (productive)
-            //    {
-            //        API.Goose.setCurrentTaskByID(g, "HappyOctocat");
-            //    }
-            //}
-            //else
-            //{
-            //    API.Goose.setCurrentTaskByID(g, "HappyOctocat");
-            //}
+            if (g.currentTask == API.TaskDatabase.getTaskIndexByID("HappyOctocat"))
+            {
+                if (unproductive && unproductiveWork >= unproductiveCap)
+                {
+                    API.Goose.setCurrentTaskByID(g, "AngryOctocat");
+                }
+            }
+            else if (g.currentTask == API.TaskDatabase.getTaskIndexByID("AngryOctocat"))
+            {
+                if (productive)
+                {
+                    API.Goose.setCurrentTaskByID(g, "HappyOctocat");
+                }
+            }
+            else
+            {
+                API.Goose.setCurrentTaskByID(g, "HappyOctocat");
+            }
             //g.render(g, Graphics.FromImage(octocat));
             // logic
         }
@@ -189,7 +189,7 @@ namespace DefaultMod
             if (speed > 150)
                 temp *= 2;
 
-            if (temp / 30 < 0 || temp / 30 > 5)
+            if (temp / 30 < 0 || temp / 30 > 7)
             {
                 temp = 0;
                 frameCounter = 0;
@@ -197,11 +197,47 @@ namespace DefaultMod
 
             currentOcto = octoCostume[temp/30];
 
-            var direction = g.direction+90;
             var headPoint = g.rig.bodyCenter;
 
             var verticalOffset = currentOcto.Height /2;
             var horizontalOffset = currentOcto.Width / 2;
+
+            int target;
+
+            if (speed > 75) {
+                target = (int)g.direction + 90;
+                if(!prevMoving)
+                    locked = false;
+                prevMoving = true;
+            }
+            else {
+                target = 0;
+                if(prevMoving)
+                    locked = false;
+                prevMoving = false;
+            }
+
+            if(!locked) {
+
+                int current = direction - target;
+
+                if(current > 180) {
+                    direction += 2;
+                    if(direction >= 360)
+                        direction -= 360;
+                } else if(current < 180 && Math.Abs(current) > 3) {
+                    direction -= 2;
+                } else {
+                    locked = true;
+                }
+            } else {
+                direction = target;
+            }
+
+            if(direction >= 360)
+                direction -= 360;
+            else if(direction < 0) 
+                direction += 360;
 
             Bitmap newSprite = RotateImage(new Bitmap(currentOcto), direction);
 

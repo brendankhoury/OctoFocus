@@ -48,6 +48,8 @@
     <Compile Include="ModMain.cs" />
     <Compile Include="TaskHappyOctocat.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+	<Compile Include="TaskGrabbingOctocat.cs"/>
+	<Compile Include="TaskAngryOctocat.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GooseModdingAPI\GooseModdingAPI.csproj">

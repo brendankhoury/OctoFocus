@@ -68,16 +68,19 @@ namespace DefaultMod
 
             //goose.currentAcceleration = 1000;
             //goose.setSpeed(100);
-            Vector2 bottomRightCorner = new Vector2(data.screenWidth - 70, data.screenHeight - 150);
-            if (Vector2.Distance(bottomRightCorner, goose.rig.bodyCenter) < 100)
+            Vector2 bottomRightCorner = new Vector2(data.screenWidth - 400/*70*/, data.screenHeight - 150);
+            if (Vector2.Distance(bottomRightCorner, goose.rig.bodyCenter) < 100 && Vector2.Distance(bottomRightCorner, goose.rig.bodyCenter) > 30)
             {
                 API.Goose.setSpeed(goose, GooseEntity.SpeedTiers.Walk);
-            } else
+                // Set code which stops the octocat from moving if it gets close enough to the poin
+                goose.targetPos = bottomRightCorner;
+            } else if (Vector2.Distance(bottomRightCorner, goose.rig.bodyCenter) >= 100)
             {
                 API.Goose.setSpeed(goose, GooseEntity.SpeedTiers.Charge);
+                // Set code which stops the octocat from moving if it gets close enough to the poin
+                goose.targetPos = bottomRightCorner;
             }
-            // Set code which stops the octocat from moving if it gets close enough to the poin
-            goose.targetPos = bottomRightCorner;
+
         }
     }
 }
