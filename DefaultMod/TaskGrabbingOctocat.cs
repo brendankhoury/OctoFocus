@@ -66,11 +66,12 @@ namespace DefaultMod
             bool success = GetWindowRect(activeWindow, out lpRect);
             if (!success)
             {
-                taskData.activeWindowTopRightCorner = new Vector2((float)500, (float)500);
+                taskData.activeWindowTopRightCorner = new Vector2((int)500, (int)500);
             }
             else
             {
-                taskData.activeWindowTopRightCorner = new Vector2((float)lpRect.Right, (float)lpRect.Top);
+                
+                taskData.activeWindowTopRightCorner = new Vector2((int)lpRect.Right, (int)lpRect.Top);
             }
             string output = "Top: " + lpRect.Top + " Right: " + lpRect.Right;
             Console.WriteLine(output);

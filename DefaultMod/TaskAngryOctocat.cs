@@ -70,11 +70,11 @@ namespace DefaultMod
                 API.Goose.setCurrentTaskByID(goose, "GrabbingOctocat");
                 //Console.WriteLine("Changed To grabbing cursor");
             }
-            if (Time.time - data.timeStarted > 10)
-            {
-                API.Goose.setCurrentTaskByID(goose, "HappyOctocat");
+            //if (Time.time - data.timeStarted > 10)
+            //{
+            //    API.Goose.setCurrentTaskByID(goose, "HappyOctocat");
 
-            }
+            //}
             API.Goose.setSpeed(goose, GooseEntity.SpeedTiers.Charge);
 
             goose.targetPos = mousePos; 

@@ -157,8 +157,8 @@ namespace DefaultMod
                 }
                 activeWindow = checkedWindow;
                 timeStopwatch.Restart();
-                string output = "Productive?: " + productive + " ProductiveWork: " + productiveWork + " || UnproductiveWork: " + unproductiveWork;
-                Console.WriteLine(output);
+                //string output = "Productive?: " + productive + " ProductiveWork: " + productiveWork + " || UnproductiveWork: " + unproductiveWork;
+                //Console.WriteLine(output);
             }
 
 
@@ -214,7 +214,7 @@ namespace DefaultMod
 
             int target;
 
-            if (speed > 70 && g.currentTask != API.TaskDatabase.getTaskIndexByID("GrabbingOctocat")*/) {
+            if (speed > 70 && g.currentTask != API.TaskDatabase.getTaskIndexByID("GrabbingOctocat")) {
                 target = (int)g.direction + 90;
                 if(!prevMoving)
                     locked = false;
