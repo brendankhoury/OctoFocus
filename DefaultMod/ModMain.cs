@@ -42,8 +42,8 @@ namespace DefaultMod
 
         int direction = -1;
 
-        bool locked = true;
-        bool prevMoving = false;
+        bool locked = false;
+        bool prevMoving = false;    
         
         string[] productiveWindows = { "visual studio", "stack overflow", "github", "vs code", "duckduckgo", "devpost" };
         string[] unproductiveWindows = { "steam", "facebook", "reddit", "discord", "youtube", "instagram", "league of legends", "clubpenguin", "netflix", "valorant" };
@@ -61,7 +61,7 @@ namespace DefaultMod
             // Subscribe to whatever events we want
             InjectionPoints.PostTickEvent += WindowCheck;
             InjectionPoints.PreTickEvent += OneTimeInitialization;
-            InjectionPoints.PreRenderEvent += OctoPostRender; // post render
+            // InjectionPoints.PostRenderEvent += OctoPostRender; // post render
 
             Console.WriteLine(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "idle_0.png"));
 
@@ -92,10 +92,14 @@ namespace DefaultMod
             Console.WriteLine("Goose OneTimeInitialization");
 
             // Make goose invisible.
-            g.renderData.brushGooseOutline = new SolidBrush(Color.Transparent);
+            /*g.renderData.brushGooseOutline = new SolidBrush(Color.Transparent);
             g.renderData.brushGooseWhite = new SolidBrush(Color.Transparent);
             g.renderData.brushGooseOrange = new SolidBrush(Color.Transparent);
             g.renderData.shadowBrush = new TextureBrush(transparent);
+            g.renderData.DrawingPen = new Pen(Color.Transparent);
+*/
+            g.render = OctoPostRender;
+
 
             g.parameters.StepTimeNormal = 500f;
             g.parameters.StepTimeCharged = 500f;
@@ -254,7 +258,7 @@ namespace DefaultMod
                     direction += 2;
                     if(direction >= 360)
                         direction -= 360;
-                } else if(current < 180 && Math.Abs(current) > 1) { // > 3
+                } else if(current < 180 && Math.Abs(current) > 1) {// > 3
                     direction -= 2;
                 } else {
                     locked = true;
@@ -273,13 +277,15 @@ namespace DefaultMod
 //            if (Vector2.Distance(bottomRightCorner, g.rig.bodyCenter) < 10 && direction < 10 && (direction < 10 || direction > 350)) {
 //                direction = 0;
 //            } 
-            direction = 0;
-
-            Bitmap newSprite = RotateImage(new Bitmap(currentOcto), direction);
+//            direction = 0;
+            if (direction == 0)
+                direction += 1;
+            // direction = 0;
+            if (direction > 180) direction = -(360 - direction);
+            Bitmap newSprite = RotateImage(currentOcto, (float) direction, true);
             
-            if(g.currentTask == API.TaskDatabase.getTaskIndexByID("GrabbingOctocat")) {
+            if(g.currentTask == API.TaskDatabase.getTaskIndexByID("GrabbingOctocat"))
                 graph.DrawImage(newSprite, headPoint.x-horizontalOffset, headPoint.y-(int)(1.5f*verticalOffset));
-            }
             else
                 graph.DrawImage(newSprite, headPoint.x-horizontalOffset, headPoint.y-verticalOffset);
 
@@ -287,7 +293,7 @@ namespace DefaultMod
 
         }
 
-        private static Bitmap RotateImage(Bitmap b, float angle)
+        /*private static Bitmap RotateImage(Bitmap b, float angle)
         {
 
             Bitmap returnBitmap = new Bitmap(b.Width, b.Height);
@@ -302,6 +308,67 @@ namespace DefaultMod
 
             return returnBitmap;
 
+        }*/
+
+        public static Bitmap RotateImage(Image image, float angle, bool bNoClip)
+        {
+            int W, H, X, Y;
+            if (bNoClip)
+            {
+                double dW = (double)image.Width;
+                double dH = (double)image.Height;
+
+                double degrees = Math.Abs(angle);
+                if (degrees <= 90)
+                {
+                    double radians = 0.0174532925 * degrees;
+                    double dSin = Math.Sin(radians);
+                    double dCos = Math.Cos(radians);
+                    W = (int)(dH * dSin + dW * dCos);
+                    H = (int)(dW * dSin + dH * dCos);
+                    X = (W - image.Width) / 2;
+                    Y = (H - image.Height) / 2;
+                }
+                else
+                {
+                    degrees -= 90;
+                    double radians = 0.0174532925 * degrees;
+                    double dSin = Math.Sin(radians);
+                    double dCos = Math.Cos(radians);
+                    W = (int)(dW * dSin + dH * dCos);
+                    H = (int)(dH * dSin + dW * dCos);
+                    X = (W - image.Width) / 2;
+                    Y = (H - image.Height) / 2;
+                }
+            }
+            else
+            {
+                W = image.Width;
+                H = image.Height;
+                X = 0;
+                Y = 0;
+            }
+
+            //create a new empty bitmap to hold rotated image
+            Bitmap bmpRet = new Bitmap(W, H);
+            bmpRet.SetResolution(image.HorizontalResolution, image.VerticalResolution);
+
+            //make a graphics object from the empty bitmap
+            Graphics g = Graphics.FromImage(bmpRet);
+
+            //Put the rotation point in the "center" of the image
+            g.TranslateTransform(X+(float)image.Width / 2, X+(float)image.Height / 2);
+
+            //rotate the image
+            g.RotateTransform(angle);
+
+            //move the image back
+            g.TranslateTransform(-X-(float)image.Width / 2, -X-(float)image.Height / 2);
+
+            //draw passed in image onto graphics object
+            g.DrawImage(image, new PointF(0 + X, 0 + Y));
+
+            return bmpRet;
         }
 
 
