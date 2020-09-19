@@ -68,7 +68,8 @@ namespace DefaultMod
 
             //goose.currentAcceleration = 1000;
             //goose.setSpeed(100);
-            Vector2 bottomRightCorner = new Vector2(data.screenWidth - 400/*70*/, data.screenHeight - 150);
+            int offsetFromLeft = 70;
+            Vector2 bottomRightCorner = new Vector2(data.screenWidth - offsetFromLeft, data.screenHeight - 150);
             if (Vector2.Distance(bottomRightCorner, goose.rig.bodyCenter) < 100 && Vector2.Distance(bottomRightCorner, goose.rig.bodyCenter) > 30)
             {
                 API.Goose.setSpeed(goose, GooseEntity.SpeedTiers.Walk);

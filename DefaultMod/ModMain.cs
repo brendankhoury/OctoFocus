@@ -166,7 +166,14 @@ namespace DefaultMod
             {
                 if (unproductive && unproductiveWork >= unproductiveCap && angryTimer.ElapsedMilliseconds / 10000 % 2 == 0)
                 {
-                    API.Goose.setCurrentTaskByID(g, "AngryOctocat");
+                    Vector2 mousePos = new Vector2(Input.mouseX, Input.mouseY);
+
+                    if (Vector2.Distance(mousePos, g.rig.bodyCenter) < 50)
+                    {
+                        API.Goose.setCurrentTaskByID(g, "GrabbingOctocat");
+                    } else {
+                        API.Goose.setCurrentTaskByID(g, "AngryOctocat");
+                    }
                     angryTimer.Start();
                 }
             }

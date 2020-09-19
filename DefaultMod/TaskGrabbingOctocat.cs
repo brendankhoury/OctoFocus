@@ -70,7 +70,11 @@ namespace DefaultMod
             }
             else
             {
-                
+                if (Double.IsNaN(lpRect.Right) || lpRect.Right < 1){
+                    lpRect.X = 0;
+                    lpRect.Width = (SystemParameters.WorkArea.Width - 75);
+                    Console.WriteLine("NaN right detected, attempting to update rect");
+                }
                 taskData.activeWindowTopRightCorner = new Vector2((int)lpRect.Right, (int)lpRect.Top);
             }
             string output = "Top: " + lpRect.Top + " Right: " + lpRect.Right;
