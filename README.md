@@ -1,6 +1,9 @@
 # OctoFocus
 Keep coding with OctoCat to keep you on track!
-
+<br/>
+ [Video](https://youtu.be/DY-XA6BJhiQ "Video")
+ <br/>
+ [Devpost Submission](https://devpost.com/software/octofocus "Devpost")
 ## Inspiration
 We were inspired by the funny but useless DesktopGoose application. DesktopGoose places a goose on the screen which preforms random actions, pulling open notes, memes, moving the cursor etc. We also set out to solve a common problem: Getting distracted while coding.
 
