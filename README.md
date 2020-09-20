@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## Inspiration
 We were inspired by the funny but useless DesktopGoose application. DesktopGoose places a goose on the screen which preforms random actions, pulling open notes, memes, moving the cursor etc. We also set out to solve a common problem: Getting distracted while coding.
 
@@ -22,3 +23,7 @@ We learned a lot about C# and understanding how to use an API without documentat
 
 ## What's next for OctoFocus
 In the future, OctoFocus could be expanded to include more animations and emotions. Rewarding users for being on task, giving words of encouragement, etc. It would be funny if the Octocat would drag windows around the more a user stays off task. Finally, implementing a config file for identifying which applications are productive/unproductive.
+=======
+# OctoFocus
+Keep coding with OctoCat to keep you on track!
+>>>>>>> dev
