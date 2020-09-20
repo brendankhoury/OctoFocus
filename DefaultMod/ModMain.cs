@@ -31,6 +31,7 @@ namespace DefaultMod
         static double unproductiveRegeration = 1; 
 
         Image[] octoCostume = new Image[8];
+        Image[] madCostume = new Image[8];
         Image grabbyCostume;
         Image transparent;
 
@@ -74,7 +75,16 @@ namespace DefaultMod
             octoCostume[6] = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "idle_2.png"));
             octoCostume[7] = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "idle_1.png"));
             
-            grabbyCostume = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "graby_0.png"));
+            madCostume[0] = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "angry_0.png"));
+            madCostume[1] = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "angry_1.png"));
+            madCostume[2] = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "angry_2.png"));
+            madCostume[3] = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "angry_3.png"));
+            madCostume[4] = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "angry_4.png"));
+            madCostume[5] = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "angry_3.png"));
+            madCostume[6] = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "angry_2.png"));
+            madCostume[7] = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "angry_1.png"));
+
+            grabbyCostume = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "grab_0_angry.png"));
 
             transparent = Image.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "transparent.png"));
 
@@ -224,6 +234,8 @@ namespace DefaultMod
 
             if(g.currentTask == API.TaskDatabase.getTaskIndexByID("GrabbingOctocat"))
                 currentOcto = grabbyCostume;
+            else if(g.currentTask == API.TaskDatabase.getTaskIndexByID("AngryOctocat"))
+                currentOcto = madCostume[frameId];
             else
                 currentOcto = octoCostume[frameId];
 
@@ -235,7 +247,7 @@ namespace DefaultMod
             int target;
 
             
-            if (speed > 70 && g.currentTask != API.TaskDatabase.getTaskIndexByID("GrabbingOctocat")) {
+            if (speed > 75 && g.currentTask != API.TaskDatabase.getTaskIndexByID("GrabbingOctocat")) {
                 // State moving and not grabbing cursor
                 target = (int)g.direction + 90;
                 if(!prevMoving)
@@ -250,18 +262,18 @@ namespace DefaultMod
                 prevMoving = false;
             }
 
+
             if(!locked) {
 
                 int current = direction - target;
-
-                if(current > 180) {
-                    direction += 2;
-                    if(direction >= 360)
-                        direction -= 360;
-                } else if(current < 180 && Math.Abs(current) > 1) {// > 3
-                    direction -= 2;
-                } else {
+                if(Math.Abs(current) <= 3){
                     locked = true;
+                    direction = target;
+                }
+                else if(current > 180) {
+                    direction += 2;
+                } else if(current < 180) {// > 3
+                    direction -= 2;
                 }
             } else {
                 direction = target;
@@ -277,11 +289,13 @@ namespace DefaultMod
 //            if (Vector2.Distance(bottomRightCorner, g.rig.bodyCenter) < 10 && direction < 10 && (direction < 10 || direction > 350)) {
 //                direction = 0;
 //            } 
-//            direction = 0;
-            if (direction == 0)
-                direction += 1;
             direction = 0;
-            if (direction > 180) direction = -(360 - direction);
+            
+                
+            Console.WriteLine("target: " + target);
+            Console.WriteLine("locked: " + locked);
+            Console.WriteLine("speed: " + speed);
+
             Bitmap newSprite = RotateImage(new Bitmap(currentOcto), (float) direction);
             
             if(g.currentTask == API.TaskDatabase.getTaskIndexByID("GrabbingOctocat"))
